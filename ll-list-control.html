@@ -38,67 +38,79 @@ Example:
         max-width: 100px;
       }
     </style>
-    <h1>&lt;ll-list-control&gt;</h1>
-    <content></content>
-    <p class="author">
-      <img src="{{author.image}}">
-      Cheers,<br/>
-      <span class="name">{{author.name}}</span>
-    </p>
+    <div style="display: block;">
+      <div class="row">
+        <div class="col-sm-4">
+          <h2>[[controlTitle]]</h2>
+        </div>
+        <div class="col-sm-8">
+          <div class="pull-right">
+            <div id="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateNewSelected">[[associateText]]</div>
+            <div id="addNewButton" class="btn btn-default pull-right" on-tap="_fireCreateNewSelected" style="margin-right:15px;">Create New</div>
+            <div id="removeItemButton" class="btn btn-destructive pull-right" on-tap="_fireRemoveSelected" style="margin-right:15px;display:none;">Remove Selected</div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <template id="item-list" is="dom-repeat" items="[[items]]" >
+        <div>
+          <div style="margin-bottom:10px;" class="row">
+            <div class="col-sm-1 col-xs-2 text-center">
+              <input type="radio" name=[[radioButtonGroupName]] id="[[item.id]]" on-tap="_prepareForRemoval">
+            </div>
+            <div class="col-sm-3 col-xs-10">[[item.name]]</div>
+          </div>
+        </div>
+      </template>
+      <p id="listEmpty" style="display: block;">No properties to display <a href="#" id="addItemLink">Add one now &gt;</a></p>
+      <hr>
+    </div>
   </template>
 
 </dom-module>
 
 <script>
+  var selectedItemId = '';
 
   Polymer({
 
     is: 'll-list-control',
 
     properties: {
-
       /**
-       * `fancy` indicates that the element should don a monocle and tophat,
-       * while checking its pocket watch.
+       * The Title of the control
        */
-      fancy: Boolean,
-
-      /**
-       * Describes the author of the element, but is really just an excuse to
-       * show off JSDoc annotations.
-       *
-       * @type {{name: string, image: string}}
-       */
-      author: {
-        type: Object,
-        // Use `value` to provide a default value for a property, by setting it
-        // on your element's prototype.
-        //
-        // If you provide a function, as we do here, Polymer will call that
-        // _per element instance_.
-        //
-        // We do that to ensure that each element gets its own copy of the
-        // value, rather than having it shared across all instances (via the
-        // prototype).
-        value: function() {
-          return {
-            name:  'Dimitri Glazkov',
-            image: 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg',
-          };
-        }
+      controlTitle: {
+        type: String,
+        default: ''
       },
-
+      /**
+       * The text to display on the associate existing button
+       */
+      associateText: {
+        type: String,
+        default: 'Associate New'
+      },
+      /**
+       * The items to display
+       *
+       * @type {[{_id: string, title: string, description: string, isDefault: boolean, url: string}]}
+       */
+      items: {
+        type: Array,
+        notify: true,
+        default: []
+      },
+      radioButtonGroupName: {
+        type: String,
+        default: 'toRemove'
+      }
     },
 
     // Element Lifecycle
 
     ready: function() {
-      // `ready` is called after all elements have been configured, but
-      // propagates bottom-up. This element's children are ready, but parents
-      // are not.
-      //
-      // This is the point where you should make modifications to the DOM (when
-      // necessary), or kick off any processes the element wants to perform.
+      this._showEmptyText();
     },
 
     attached: function() {
@@ -117,34 +129,30 @@ Example:
       // Use this to clean up anything you did in `attached`.
     },
 
-    // Element Behavior
-
-    /**
-     * The `ll-list-control-lasers` event is fired whenever `fireLasers` is called.
-     *
-     * @event ll-list-control-lasers
-     * @detail {{sound: String}}
-     */
-
-    /**
-     * Sometimes it's just nice to say hi.
-     *
-     * @param {string} greeting A positive greeting.
-     * @return {string} The full greeting.
-     */
-    sayHello: function(greeting) {
-      var response = greeting || 'Hello World!';
-      return 'll-list-control says, ' + response;
+    _showEmptyText: function(){
+      if(this.items && this.items.length > 0){
+        this.$.listEmpty.style.display = "none";
+      }
+      else{
+        this.$.listEmpty.style.display = "block";
+      }
     },
-
     /**
-     * Attempt to destroy this element's enemies with a beam of light!
-     *
-     * Or, at least, dispatch an event in the vain hope that someone else will
-     * do the zapping.
+     * Sorts the initial list of returned images by the image sortOrder property.
+     * @private
      */
-    fireLasers: function() {
-      this.fire('ll-list-control-lasers', {sound: 'Pew pew!'});
+    _prepareForRemoval: function(e){
+      this.selectedItemId = e.target.id;
+      this.$.removeItemButton.style.display = "block";
+    },
+    _fireRemoveSelected: function(){
+      this.fire('remove-new', {selectedItemId: this.selectedItemId});
+    },
+    _fireCreateNewSelected: function(){
+      this.fire('create-new');
+    },
+    _fireAssociateNewSelected: function(){
+      this.fire('associate-new');
     }
 
   });
