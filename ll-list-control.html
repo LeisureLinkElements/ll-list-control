@@ -1,43 +1,28 @@
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../ll-theme/ll-theme.html">
 
 <!--
-An element providing a solution to no problem in particular.
-
 Example:
 
     <ll-list-control></ll-list-control>
 
-@group Seed Elements
-@element ll-list-control
-@demo demo/index.html
-@hero hero.svg
+@demo
 -->
 <dom-module id="ll-list-control">
 
+  <style>
+    h2 {
+      border: none;
+      padding-bottom: 0;
+    }
+
+    .btn-default {
+      padding: .7em 1.8em;
+      font-size: 1.4rem;
+    }
+  </style>
+
   <template>
-    <style>
-      :host {
-        display: block;
-        box-sizing: border-box;
-      }
-  
-      .author img {
-        display: block;
-        float: left;
-        margin-right: 5px;
-        max-height: 100px;
-        max-width: 100px;
-      }
-    </style>
     <div style="display: block;">
       <div class="row">
         <div class="col-sm-4">
@@ -45,7 +30,7 @@ Example:
         </div>
         <div class="col-sm-8">
           <div class="pull-right">
-            <div id="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateNewSelected">[[associateText]]</div>
+            <div id="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateItemsSelected">[[associateText]]</div>
             <div id="addNewButton" class="btn btn-default pull-right" on-tap="_fireCreateNewSelected" style="margin-right:15px;">Create New</div>
             <div id="removeItemButton" class="btn btn-destructive pull-right" on-tap="_fireRemoveSelected" style="margin-right:15px;display:none;">Remove Selected</div>
           </div>
@@ -56,13 +41,13 @@ Example:
         <div>
           <div style="margin-bottom:10px;" class="row">
             <div class="col-sm-1 col-xs-2 text-center">
-              <input type="radio" name=[[radioButtonGroupName]] id="[[item.id]]" on-tap="_prepareForRemoval">
+              <input type="radio" name=[[radioButtonGroupName]] id="[[_itemIdentifier(item)]]" on-tap="_prepareForRemoval">
             </div>
-            <div class="col-sm-3 col-xs-10">[[item.name]]</div>
+            <div class="col-sm-3 col-xs-10">[[_itemDisplay(item)]]</div>
           </div>
         </div>
       </template>
-      <p id="listEmpty" style="display: block;">No properties to display <a href="#" id="addItemLink">Add one now &gt;</a></p>
+      <p id="listEmpty" style="display: block;">[[emptyListText]] <a href="#" id="addItemLink">Add one now &gt;</a></p>
       <hr>
     </div>
   </template>
@@ -92,67 +77,117 @@ Example:
         default: 'Associate New'
       },
       /**
+       * The text to display when no items are available
+       */
+      emptyListText: {
+        type: String,
+        default: 'Nothing to display'
+      },
+      /**
        * The items to display
        *
-       * @type {[{_id: string, title: string, description: string, isDefault: boolean, url: string}]}
+       * This array is generic:
+       *    populate the idFieldName property to identify the field name that contains the id
+       *    populate the displayFieldNames array to identify the fields to be displayed in the list
+       *
        */
       items: {
         type: Array,
         notify: true,
-        default: []
+        default: [],
+        observer: '_showEmptyText'
       },
+      /**
+       * The name of the id field in the items array
+       *
+       */
+      idFieldName: {
+        type: String,
+        default: 'id'
+      },
+      /**
+       * An array of field names to display in the list
+       *
+       * usage: display-field-names=JSON.stringify(["name","description"])
+       */
+      displayFieldNames: {
+        type: Array,
+        default: ['name']
+      },
+      /**
+       * Separator used when building the list
+       *
+       */
+      displayFieldSeparator: {
+        type: String,
+        default: ' '
+      },
+      /**
+       * This allows multiple radio button groups on the same html page
+       * simple change the name for this control to have its own radio button group
+       *
+       */
       radioButtonGroupName: {
         type: String,
         default: 'toRemove'
       }
     },
 
-    // Element Lifecycle
-
-    ready: function() {
-      this._showEmptyText();
-    },
-
-    attached: function() {
-      // `attached` fires once the element and its parents have been inserted
-      // into a document.
-      //
-      // This is a good place to perform any work related to your element's
-      // visual state or active behavior (measuring sizes, beginning animations,
-      // loading resources, etc).
-    },
-
-    detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
-    },
-
-    _showEmptyText: function(){
-      if(this.items && this.items.length > 0){
-        this.$.listEmpty.style.display = "none";
-      }
-      else{
-        this.$.listEmpty.style.display = "block";
-      }
+    /**
+     * Internal funtction to set the identifier for the radio button
+     */
+    _itemIdentifier: function(item){
+      return item[this.idFieldName];
     },
     /**
-     * Sorts the initial list of returned images by the image sortOrder property.
-     * @private
+     * Internal funtction to set the display text of each line item
+     */
+    _itemDisplay: function(item){
+      var result = '';
+      this.displayFieldNames = this.displayFieldNames || [];
+      this.displayFieldSeparator = this.displayFieldSeparator || ' ';
+
+      for (var i = 0; i < this.displayFieldNames.length; i++) {
+        result += item[this.displayFieldNames[i]] + this.displayFieldSeparator;
+      }
+      if (result.length > this.displayFieldSeparator.length){
+        result = result.substring(0, result.length - this.displayFieldSeparator.length);
+      }
+      return result;
+    },
+    /**
+     * Internal function to hide or show the "empty text"
+     */
+    _showEmptyText: function(){
+      this.toggleClass('hidden', this.items.length, this.$.listEmpty);
+    },
+    /**
+     * Internal function to set the internal selectedItemId so that when a user selects the "Remove" button an event
+     * can fire with the selected id
      */
     _prepareForRemoval: function(e){
       this.selectedItemId = e.target.id;
       this.$.removeItemButton.style.display = "block";
     },
+    /**
+     * Event - Remove Selected
+     *
+     * Params: {selectedItemId: "stringIdentifier"}
+     */
     _fireRemoveSelected: function(){
-      this.fire('remove-new', {selectedItemId: this.selectedItemId});
+      this.fire('remove-selected', {selectedItemId: this.selectedItemId});
     },
+    /**
+     * Event - create-new
+     */
     _fireCreateNewSelected: function(){
       this.fire('create-new');
     },
-    _fireAssociateNewSelected: function(){
-      this.fire('associate-new');
+    /**
+     * Event - associate-new
+     */
+    _fireAssociateItemsSelected: function(){
+      this.fire('associate-items');
     }
 
   });

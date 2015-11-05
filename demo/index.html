@@ -1,48 +1,77 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <title>ll-list-control Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="../ll-list-control.html">
-  </head>
-  <body unresolved>
+</head>
+<body unresolved>
 
-    <p>An example of <code>&lt;ll-list-control&gt;</code>:</p>
+<p>An example of <code>&lt;ll-list-control&gt;</code>:</p>
 
-    <p>Make words! <button id="saybtn">Say Something</button></p>
-    <p>Make lasers! <button id="laserbtn">Fire lasers</button></p>
+<button onclick="addTestItem()" style="margin-left:15px;">Add a demo item</button>
 
-    <ll-list-control author='{"name": "Lord Meowser", "image": "http://placekitten.com/g/200/300"}' fancy>
-      <h2>Hello ll-list-control</h2>
+<div style="padding:15px;">
+    <ll-list-control control-title="Associated Items"
+                     associate-text="Add Existing Item"
+                     empty-list-text="No items to display"
+                     id-field-name="itemId"
+                     radio-button-group-name="group1"
+                     display-field-separator=" - "
+                     fancy>
     </ll-list-control>
+</div>
 
-    <script>
-      var seedElement = document.querySelector('ll-list-control');
-      
-      document.querySelector('#saybtn').addEventListener('click', function() {
-        alert(seedElement.sayHello('Hallo!'));
-      });
-      
-      document.querySelector('#laserbtn').addEventListener('click', function() {
-        seedElement.fireLasers();
-      });
-      
-      document.addEventListener("ll-list-control-lasers", function(e) {
-        console.log(e.detail.sound);
-      });
-      
-    </script>
+<div id="logs" style="margin-left:15px;">
+    <div>Logs:</div>
+</div>
 
-  </body>
+<script>
+    var demoControl = document.querySelector('ll-list-control');
+    demoControl.displayFieldNames = ['name', 'type'];
+
+    var addTestItem = function () {
+        demoControl.items = [
+            {
+                _id: 'NyQ7h8VGg',
+                itemId: 'NyQ7h8VGg',
+                name: 'First Item',
+                type: 'FLAT',
+                description: 'Some item description',
+                validFor: [
+                    {
+                        start: '2015-11-05T00:00:00.000Z',
+                        end: null,
+                        amount: 10,
+                        lastTouched: [{
+                            when: '2015-11-05T14:51:47.091Z'
+                        }]
+                    }]
+            }
+        ]
+    };
+
+    var addLog = function(message){
+        var logs = document.getElementById('logs');
+        var newMessage = document.createElement('div');
+        newMessage.innerHTML = message;
+        logs.appendChild(newMessage);
+    };
+
+    document.addEventListener('create-new', function() {
+        addLog('Create new selected');
+    });
+    document.addEventListener('associate-items', function() {
+        addLog('Associate item selected');
+    });
+    document.addEventListener('remove-selected', function(event) {
+        console.log(event.detail);
+        addLog('Remove selected with id: ' + event.detail.selectedItemId);
+    });
+
+</script>
+
+</body>
 </html>
