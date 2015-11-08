@@ -3,8 +3,26 @@
 
 <!--
 Example:
+    var arrayOfObjectsToDisplay = [{
+      identifierPropertyNameForRadioButtonId = "aaa111",
+      propertyToDisplay1 = "Beginning of text to display",
+      propertyToDisplay2 = "end of text to display"
+    },{
+      identifierPropertyNameForRadioButtonId = "bbb222",
+      propertyToDisplay1 = "Another beginning of text to display",
+      propertyToDisplay2 = "Another end of text to display"
+    }]
 
-    <ll-list-control></ll-list-control>
+    <ll-list-control
+      control-title="Header Text of the control",
+      associate-text="Add Existing Button Text",
+      items=JSON.stringify(arrayOfObjectsToDisplay),
+      empty-list-text="No taxes to display",
+      id-field-name="identifierPropertyNameForRadioButtonId",
+      display-field-names=JSON.stringify(["propertyToDisplay1","propertyToDisplay2"]),
+      display-field-separator=" - ",
+      radio-button-group-name="nameOfRadioButtonGroupToAllowMultipleGroupsOnOnePage"
+    />
 
 @demo
 -->
@@ -26,13 +44,13 @@ Example:
     <div style="display: block;">
       <div class="row">
         <div class="col-sm-4">
-          <h2>[[controlTitle]]</h2>
+          <h2 name="controlTitle">[[controlTitle]]</h2>
         </div>
         <div class="col-sm-8">
           <div class="pull-right">
-            <div id="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateItemsSelected">[[associateText]]</div>
-            <div id="addNewButton" class="btn btn-default pull-right" on-tap="_fireCreateNewSelected" style="margin-right:15px;">Create New</div>
-            <div id="removeItemButton" class="btn btn-destructive pull-right" on-tap="_fireRemoveSelected" style="margin-right:15px;display:none;">Remove Selected</div>
+            <div id="addItemButton" name="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateItemsSelected">[[associateText]]</div>
+            <div id="addNewButton" name="addNewButton" class="btn btn-default pull-right" on-tap="_fireCreateNewSelected" style="margin-right:15px;">Create New</div>
+            <div id="removeItemButton" name="removeItemButton" class="btn btn-destructive pull-right" on-tap="_fireRemoveSelected" style="margin-right:15px;display:none;">Remove Selected</div>
           </div>
         </div>
       </div>
@@ -43,11 +61,11 @@ Example:
             <div class="col-sm-1 col-xs-2 text-center">
               <input type="radio" name=[[radioButtonGroupName]] id="[[_itemIdentifier(item)]]" on-tap="_prepareForRemoval">
             </div>
-            <div class="col-sm-3 col-xs-10">[[_itemDisplay(item)]]</div>
+            <div name="itemDisplay" class="col-sm-3 col-xs-10">[[_itemDisplay(item)]]</div>
           </div>
         </div>
       </template>
-      <p id="listEmpty" style="display: block;">[[emptyListText]] <a href="#" id="addItemLink">Add one now &gt;</a></p>
+      <p id="listEmpty" name="listEmpty" style="display: block;">[[emptyListText]] <a href="#" id="addItemLink">Add one now &gt;</a></p>
       <hr>
     </div>
   </template>
@@ -134,13 +152,13 @@ Example:
     },
 
     /**
-     * Internal funtction to set the identifier for the radio button
+     * Internal function to set the identifier for the radio button using a dynamic name that was passed in during control creation
      */
     _itemIdentifier: function(item){
       return item[this.idFieldName];
     },
     /**
-     * Internal funtction to set the display text of each line item
+     * Internal function to set the display text of each line item using the dynamic array of field names that was passed in during control creation
      */
     _itemDisplay: function(item){
       var result = '';
@@ -163,28 +181,29 @@ Example:
     },
     /**
      * Internal function to set the internal selectedItemId so that when a user selects the "Remove" button an event
-     * can fire with the selected id
+     * can fire with the last selected id
      */
     _prepareForRemoval: function(e){
       this.selectedItemId = e.target.id;
       this.$.removeItemButton.style.display = "block";
     },
     /**
-     * Event - Remove Selected
+     * Event - Raises an event to notify the parent control that a request was made to remove the association of the selected item from the parent object
      *
      * Params: {selectedItemId: "stringIdentifier"}
      */
     _fireRemoveSelected: function(){
+      this.selectedItemId = this.selectedItemId || '';
       this.fire('remove-selected', {selectedItemId: this.selectedItemId});
     },
     /**
-     * Event - create-new
+     * Event - Raises an event to notify the parent control that a request was made to create a new item and associate it to the parent object
      */
     _fireCreateNewSelected: function(){
       this.fire('create-new');
     },
     /**
-     * Event - associate-new
+     * Event - Raises an event to notify the parent control that a request was made to associate existing items to the parent object
      */
     _fireAssociateItemsSelected: function(){
       this.fire('associate-items');

@@ -1,13 +1,5 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
+
 <html>
   <head>
     <meta charset="utf-8">
@@ -15,42 +7,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../test-fixture/test-fixture-mocha.js"></script>
 
     <!-- Step 1: import the element to test -->
     <link rel="import" href="../ll-list-control.html">
+    <link rel="import" href="../../test-fixture/test-fixture.html">
   </head>
   <body>
 
     <!-- You can use the document as a place to set up your fixtures. -->
-    <ll-list-control></ll-list-control>
+    <test-fixture id="fixture">
+      <template>
+        <ll-list-control></ll-list-control>
+      </template>
+    </test-fixture>
 
-    <script>
-      var myEl = document.querySelector('ll-list-control');
-
-      suite('<ll-list-control>', function() {
-
-        test('defines the "author" property', function() {
-          assert.equal(myEl.author.name, 'Dimitri Glazkov');
-          assert.equal(myEl.author.image, 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg');
-        });
-
-        test('says hello', function() {
-          assert.equal(myEl.sayHello(), 'll-list-control says, Hello World!');
-
-          var greetings = myEl.sayHello('greetings Earthlings');
-          assert.equal(greetings, 'll-list-control says, greetings Earthlings');
-        });
-
-        test('fires lasers', function(done) {
-          myEl.addEventListener('ll-list-control-lasers', function(event) {
-            assert.equal(event.detail.sound, 'Pew pew!');
-            done();
-          });
-          myEl.fireLasers();
-        });
-
-      });
-    </script>
+    <script src="scripts/basic-test.js"></script>
 
   </body>
 </html>
