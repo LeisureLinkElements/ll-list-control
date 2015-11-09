@@ -24,6 +24,16 @@ Example:
       radio-button-group-name="nameOfRadioButtonGroupToAllowMultipleGroupsOnOnePage"
     />
 
+    document.addEventListener('create-new', function() {
+        // do something
+    });
+    document.addEventListener('associate-items', function() {
+        // do something
+    });
+    document.addEventListener('remove-selected', function(event) {
+        // do something with id: event.detail.selectedItemId
+    });
+
 @demo
 -->
 <dom-module id="ll-list-control">
