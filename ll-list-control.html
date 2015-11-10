@@ -2,7 +2,8 @@
 <link rel="import" href="../ll-theme/ll-theme.html">
 
 <!--
-Example:
+An element to list things. You would have the following objects setup for the example usage:
+
     var arrayOfObjectsToDisplay = [{
       identifierPropertyNameForRadioButtonId = "aaa111",
       propertyToDisplay1 = "Beginning of text to display",
@@ -13,16 +14,20 @@ Example:
       propertyToDisplay2 = "Another end of text to display"
     }]
 
-    <ll-list-control
-      control-title="Header Text of the control",
-      associate-text="Add Existing Button Text",
-      items=JSON.stringify(arrayOfObjectsToDisplay),
-      empty-list-text="No taxes to display",
-      id-field-name="identifierPropertyNameForRadioButtonId",
-      display-field-names=JSON.stringify(["propertyToDisplay1","propertyToDisplay2"]),
-      display-field-separator=" - ",
-      radio-button-group-name="nameOfRadioButtonGroupToAllowMultipleGroupsOnOnePage"
-    />
+    var fieldNamesArray = ['propertyToDisplay1','propertyToDisplay2']
+
+Example:
+
+    <ll-list-control control-title="Header Text of the control"
+      associate-text="Add Existing Button Text"
+      items=arrayOfObjectsToDisplay
+      empty-list-text="No taxes to display"
+      id-field-name="identifierPropertyNameForRadioButtonId"
+      display-field-names=fieldNamesArray
+      display-field-separator=" - "
+      radio-button-group-name="nameOfRadioButtonGroupToAllowMultipleGroupsOnOnePage"></ll-list-control>
+
+Then you could setup event listeners, like:
 
     document.addEventListener('create-new', function() {
         // do something
@@ -201,6 +206,7 @@ Example:
      * Event - Raises an event to notify the parent control that a request was made to remove the association of the selected item from the parent object
      *
      * Params: {selectedItemId: "stringIdentifier"}
+     * @event remove-selected
      */
     _fireRemoveSelected: function(){
       this.selectedItemId = this.selectedItemId || '';
@@ -208,12 +214,14 @@ Example:
     },
     /**
      * Event - Raises an event to notify the parent control that a request was made to create a new item and associate it to the parent object
+     * @event create-new
      */
     _fireCreateNewSelected: function(){
       this.fire('create-new');
     },
     /**
      * Event - Raises an event to notify the parent control that a request was made to associate existing items to the parent object
+     * @event associate-items
      */
     _fireAssociateItemsSelected: function(){
       this.fire('associate-items');
