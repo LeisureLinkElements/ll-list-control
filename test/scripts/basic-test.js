@@ -10,7 +10,6 @@ describe('<ll-list-control>', function () {
   beforeEach(function (done) {
     element = fixture('fixture');
     element.controlTitle = "Associated Items";
-    element.associateText = "Add Existing Item";
     element.emptyListText = "No items to display";
     element.idFieldName = "itemId";
     element.radioButtonGroupName = "group1";
@@ -90,13 +89,6 @@ describe('<ll-list-control>', function () {
     var item = document.getElementsByName('controlTitle');
     expect(item).to.be.ok;
     expect(item[0][textSelector]).to.be.eql(element.controlTitle);
-    done();
-  });
-
-  it('should validate the text of the Add Item Button', function (done) {
-    var item = document.getElementsByName('addItemButton');
-    expect(item).to.be.ok;
-    expect(item[0][textSelector]).to.be.eql(element.associateText);
     done();
   });
 
