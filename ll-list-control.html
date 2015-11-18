@@ -63,7 +63,7 @@ Then you could setup event listeners, like:
         </div>
         <div class="col-sm-8">
           <div class="pull-right">
-            <div id="addItemButton" name="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateItemsSelected">[[associateText]]</div>
+            <div id="addItemButton" name="addItemButton" class="btn btn-primary pull-right" on-tap="_fireAssociateItemsSelected">Add Existing</div>
             <div id="addNewButton" name="addNewButton" class="btn btn-default pull-right" on-tap="_fireCreateNewSelected" style="margin-right:15px;">Create New</div>
             <div id="removeItemButton" name="removeItemButton" class="btn btn-destructive pull-right" on-tap="_fireRemoveSelected" style="margin-right:15px;display:none;">Remove Selected</div>
           </div>
@@ -76,7 +76,8 @@ Then you could setup event listeners, like:
             <div class="col-sm-1 col-xs-2 text-center">
               <input type="radio" name=[[radioButtonGroupName]] id="[[_itemIdentifier(item)]]" on-tap="_prepareForRemoval">
             </div>
-            <div name="itemDisplay" class="col-sm-3 col-xs-10">[[_itemDisplay(item)]]</div>
+            <div name="itemDisplay" class="col-sm-3 col-xs-5">[[_itemDisplay(item)]]</div>
+            <div name="itemDescription" class="col-sm-8 col-xs-5">[[_itemDescription(item)]]</div>
           </div>
         </div>
       </template>
@@ -107,7 +108,7 @@ Then you could setup event listeners, like:
        */
       associateText: {
         type: String,
-        default: 'Associate New'
+        default: 'Add Existing'
       },
       /**
        * The text to display when no items are available
@@ -148,6 +149,15 @@ Then you could setup event listeners, like:
         default: ['name']
       },
       /**
+       * An array of field names to display in the description
+       *
+       * usage: display-description-names=JSON.stringify(["description"])
+       */
+      displayDescriptionNames: {
+        type: Array,
+        default: []
+      },
+      /**
        * Separator used when building the list
        *
        */
@@ -185,6 +195,18 @@ Then you could setup event listeners, like:
       }
       if (result.length > this.displayFieldSeparator.length){
         result = result.substring(0, result.length - this.displayFieldSeparator.length);
+      }
+      return result;
+    },
+    /**
+     * Internal function to set the display text of each line item description using the dynamic array of field names that was passed in during control creation
+     */
+    _itemDescription: function(item){
+      var result = '';
+      this.displayDescriptionNames = this.displayDescriptionNames || [];
+
+      for (var i = 0; i < this.displayDescriptionNames.length; i++) {
+        result += item[this.displayDescriptionNames[i]] + ' ';
       }
       return result;
     },
